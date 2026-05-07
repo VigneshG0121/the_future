@@ -191,7 +191,7 @@
   }
   .field-input:focus { border-color: var(--accent); }
   textarea.field-input { resize: none; line-height: 1.5; }
-  .two-col      { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .two-col      { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
   .priority-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 24px; }
   .priority-btn {
     padding: 10px; border-radius: 10px; border: 1.5px solid var(--border);
@@ -308,7 +308,7 @@
   .cal-popup {
     position: absolute;
     top: calc(100% + 6px);
-    left: 0; right: 0;
+    left: 0; right: auto; min-width: 280px;
     background: #1e1e1e;
     border: 1px solid #333;
     border-radius: 14px;
