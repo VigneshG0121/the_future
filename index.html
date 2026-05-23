@@ -25,6 +25,8 @@
     --med-bg:   #281e08; --med-text:  #fbbf24; --med-dot:  #d97706;
     --high-bg:  #2c1508; --high-text: #fb923c; --high-dot: #ea580c;
     --urg-bg:   #2d0c0c; --urg-text:  #f87171; --urg-dot:  #dc2626;
+
+    --bday-bg:  #1a0a2e; --bday-text: #c084fc; --bday-dot: #a855f7;
   }
 
   html, body {
@@ -101,12 +103,23 @@
   .task-card.done {
     background: #1e1e1e; border-color: #272727; opacity: 0.65; box-shadow: none;
   }
+  .task-card.is-birthday {
+    border-color: #3d1f5e;
+    background: #1c1028;
+  }
+  .task-card.is-multiday {
+    border-left: 3px solid #2563eb;
+  }
+  .task-card.is-allday {
+    border-left: 3px solid #0891b2;
+  }
   .task-check {
     flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
     border: 2px solid var(--muted); background: transparent;
     display: flex; align-items: center; justify-content: center;
     margin-top: 2px; transition: all 0.18s; font-size: 12px; color: #fff;
   }
+  .task-card.is-birthday .task-check { border-radius: 4px; font-size: 13px; border-color: var(--bday-dot); }
   .task-card.done .task-check { background: #444; border-color: #444; }
   .task-body  { flex: 1; min-width: 0; }
   .task-top   { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -119,10 +132,11 @@
     flex-shrink: 0; font-size: 11px; font-weight: 700;
     padding: 2px 8px; border-radius: 20px; letter-spacing: 0.02em;
   }
-  .p-Low    { background: var(--low-bg);  color: var(--low-text);  }
-  .p-Medium { background: var(--med-bg);  color: var(--med-text);  }
-  .p-High   { background: var(--high-bg); color: var(--high-text); }
-  .p-Urgent { background: var(--urg-bg);  color: var(--urg-text);  }
+  .p-Low      { background: var(--low-bg);  color: var(--low-text);  }
+  .p-Medium   { background: var(--med-bg);  color: var(--med-text);  }
+  .p-High     { background: var(--high-bg); color: var(--high-text); }
+  .p-Urgent   { background: var(--urg-bg);  color: var(--urg-text);  }
+  .p-Birthday { background: var(--bday-bg); color: var(--bday-text); }
 
   /* ── Progress bar ── */
   .progress-wrap   { margin-top: 18px; }
@@ -192,6 +206,33 @@
   .field-input:focus { border-color: var(--accent); }
   textarea.field-input { resize: none; line-height: 1.5; }
   .two-col      { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+  .two-col-equal { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* ── Task type tabs ── */
+  .type-tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 4px; }
+  .type-tab {
+    padding: 10px 6px; border-radius: 10px; border: 1.5px solid var(--border);
+    background: var(--card); color: var(--muted);
+    font-family: 'Sora', sans-serif; font-weight: 700; font-size: 12px;
+    cursor: pointer; transition: all 0.15s;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .type-tab .tab-icon { font-size: 18px; }
+  .type-tab.sel-task     { background: #1a2535; color: #60a5fa; border-color: #2563eb; }
+  .type-tab.sel-birthday { background: var(--bday-bg); color: var(--bday-text); border-color: var(--bday-dot); }
+  .type-tab.sel-event    { background: #0e2020; color: #34d399; border-color: #059669; }
+
+  /* ── Time mode toggle ── */
+  .time-mode-row { display: flex; gap: 8px; margin-bottom: 0; }
+  .time-mode-btn {
+    flex: 1; padding: 9px 10px; border-radius: 10px;
+    border: 1.5px solid var(--border); background: var(--card);
+    color: var(--muted); font-family: 'Sora', sans-serif;
+    font-weight: 700; font-size: 12px; cursor: pointer;
+    transition: all 0.15s; text-align: center;
+  }
+  .time-mode-btn.active { background: #0e1e2e; color: #38bdf8; border-color: #0891b2; }
+
   .priority-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 24px; }
   .priority-btn {
     padding: 10px; border-radius: 10px; border: 1.5px solid var(--border);
@@ -218,6 +259,14 @@
   }
   .submit-btn:disabled { background: #252525; color: #555; cursor: not-allowed; }
   .submit-btn.success  { background: #27ae60; transform: scale(0.97); }
+
+  /* ── Birthday year note ── */
+  .bday-hint {
+    background: var(--bday-bg); border: 1px solid #3d1f5e;
+    border-radius: 10px; padding: 10px 14px; margin-top: 8px;
+    font-size: 12px; color: var(--bday-text); font-family: 'Lora', serif;
+    line-height: 1.5;
+  }
 
   /* ── Toast ── */
   #toast {
@@ -261,6 +310,19 @@
   }
   .task-del:hover { color: var(--accent); }
 
+  /* ── Section divider ── */
+  .section-divider {
+    font-size: 10px; font-weight: 700; color: #444; letter-spacing: 0.1em;
+    text-transform: uppercase; margin: 8px 0 6px; display: flex;
+    align-items: center; gap: 8px;
+  }
+  .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── Sheet anchor ── */
+  .sheet-today-anchor {
+    display: block; height: 1px; margin-top: -1px;
+  }
+
   /* ── Desktop ── */
   @media (min-width: 900px) {
     body { padding: 24px; background: #0e0e0e; }
@@ -289,11 +351,12 @@
       transform: translateY(-2px);
       box-shadow: 0 6px 24px rgba(192,57,43,0.2);
     }
+    .task-card.is-birthday:hover { border-color: var(--bday-dot); box-shadow: 0 6px 24px rgba(168,85,247,0.2); }
     .day-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
     .submit-btn:hover  { opacity: 0.9; transform: translateY(-1px); }
   }
 
-  /* ── Custom Calendar ─────────────────────────────────────────────────── */
+  /* ── Custom Calendar ── */
   .cal-trigger {
     display: flex; align-items: center; justify-content: space-between;
     text-align: left; cursor: pointer;
@@ -340,6 +403,7 @@
     font-size: 15px; color: var(--text); display: flex; gap: 6px;
   }
   #cal-year-label { color: var(--accent); }
+  #cal-end-year-label { color: var(--accent); }
 
   .cal-weekdays {
     display: grid; grid-template-columns: repeat(7, 1fr);
@@ -368,6 +432,10 @@
     box-shadow: 0 2px 10px rgba(192,57,43,0.45);
   }
   .cal-day.is-today.is-selected { box-shadow: 0 2px 14px rgba(192,57,43,0.65); }
+  .cal-day.in-range { background: #2d1010; color: #f0c0c0; border-radius: 0; }
+  .cal-day.range-start { border-radius: 50% 0 0 50%; background: var(--accent-grad); color: #fff; }
+  .cal-day.range-end   { border-radius: 0 50% 50% 0; background: var(--accent-grad); color: #fff; }
+  .cal-day.range-start.range-end { border-radius: 50%; }
 
   .cal-footer {
     display: flex; justify-content: flex-end; margin-top: 12px;
@@ -380,6 +448,9 @@
     transition: all 0.15s;
   }
   .cal-today-btn:hover { background: var(--accent-light); border-color: var(--accent); }
+
+  /* hidden utility */
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
@@ -391,7 +462,7 @@
     <div class="loader-text">Loading your tasks…</div>
   </div>
 
-  <!-- Config banner (shown if SCRIPT_URL not set) -->
+  <!-- Config banner -->
   <div id="config-banner">
     <strong>⚠️ Setup needed:</strong> Open this file and replace <code>YOUR_APPS_SCRIPT_URL</code> at the top of the &lt;script&gt; with your deployed Google Apps Script URL.<br>
     See the included <strong>SETUP.md</strong> for step-by-step instructions.
@@ -441,48 +512,172 @@
         <div class="page-sub">Plan something for any day</div>
       </div>
       <div style="padding:4px 24px 24px; overflow-y:auto; flex:1;">
-        <label class="field-label">Task Title *</label>
+
+        <!-- Task type selector -->
+        <label class="field-label">Type</label>
+        <div class="type-tabs" id="type-tabs">
+          <button type="button" class="type-tab sel-task" data-type="task" onclick="selectType('task')">
+            <span class="tab-icon">✅</span>Task
+          </button>
+          <button type="button" class="type-tab" data-type="birthday" onclick="selectType('birthday')">
+            <span class="tab-icon">🎂</span>Birthday
+          </button>
+          <button type="button" class="type-tab" data-type="event" onclick="selectType('event')">
+            <span class="tab-icon">📅</span>Event
+          </button>
+        </div>
+
+        <!-- Birthday hint -->
+        <div id="bday-hint" class="bday-hint hidden">
+          🎉 Birthdays repeat every year automatically. Enter the birth date — the year is only used to calculate age.
+        </div>
+
+        <label class="field-label" id="f-title-label">Task Title *</label>
         <input class="field-input" id="f-title" placeholder="What do you need to do?" />
 
         <label class="field-label">Description</label>
         <textarea class="field-input" id="f-desc" placeholder="Any details…" rows="3"></textarea>
 
-        <div class="two-col">
-          <div>
-            <label class="field-label">Date</label>
-            <div id="cal-popup-wrap" style="position:relative;"><button type="button" class="field-input cal-trigger" id="cal-trigger" onclick="toggleCal()">
-              <span id="cal-display">Select a date</span>
-              <span class="cal-icon">📅</span>
-            </button>
-            <input type="hidden" id="f-date" />
-            <!-- Custom calendar popup -->
-            <div id="cal-popup" class="cal-popup" style="display:none;">
-              <div class="cal-header">
-                <button type="button" class="cal-nav" onclick="calShift(-1)">&#8249;</button>
-                <div class="cal-month-year">
-                  <span id="cal-month-label"></span>
-                  <span id="cal-year-label"></span>
+        <!-- Date section — changes per type -->
+        <div id="date-section-task">
+          <div class="two-col">
+            <div>
+              <label class="field-label">Date</label>
+              <div id="cal-popup-wrap" style="position:relative;">
+                <button type="button" class="field-input cal-trigger" id="cal-trigger" onclick="toggleCal('start')">
+                  <span id="cal-display">Select a date</span>
+                  <span class="cal-icon">📅</span>
+                </button>
+                <input type="hidden" id="f-date" />
+                <div id="cal-popup" class="cal-popup" style="display:none;">
+                  <div class="cal-header">
+                    <button type="button" class="cal-nav" onclick="calShift(-1,'start')">&#8249;</button>
+                    <div class="cal-month-year">
+                      <span id="cal-month-label"></span>
+                      <span id="cal-year-label"></span>
+                    </div>
+                    <button type="button" class="cal-nav" onclick="calShift(1,'start')">&#8250;</button>
+                  </div>
+                  <div class="cal-weekdays">
+                    <span>Su</span><span>Mo</span><span>Tu</span><span>We</span>
+                    <span>Th</span><span>Fr</span><span>Sa</span>
+                  </div>
+                  <div id="cal-grid" class="cal-grid"></div>
+                  <div class="cal-footer">
+                    <button type="button" class="cal-today-btn" onclick="calSelectToday('start')">Today</button>
+                  </div>
                 </div>
-                <button type="button" class="cal-nav" onclick="calShift(1)">&#8250;</button>
+              </div>
+            </div>
+            <div id="time-col">
+              <label class="field-label">Time</label>
+              <div class="time-mode-row">
+                <button type="button" class="time-mode-btn active" id="tmode-specific" onclick="setTimeMode('specific')">⏰</button>
+                <button type="button" class="time-mode-btn" id="tmode-allday" onclick="setTimeMode('allday')">All Day</button>
+              </div>
+              <input class="field-input" type="time" id="f-time" value="09:00" style="margin-top:6px;" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Birthday date section -->
+        <div id="date-section-birthday" class="hidden">
+          <label class="field-label">Birth Date</label>
+          <div id="cal-popup-wrap-bday" style="position:relative;">
+            <button type="button" class="field-input cal-trigger" onclick="toggleCal('bday')">
+              <span id="cal-bday-display">Select birth date</span>
+              <span class="cal-icon">🎂</span>
+            </button>
+            <input type="hidden" id="f-bday-date" />
+            <div id="cal-popup-bday" class="cal-popup" style="display:none;">
+              <div class="cal-header">
+                <button type="button" class="cal-nav" onclick="calShift(-1,'bday')">&#8249;</button>
+                <div class="cal-month-year">
+                  <span id="cal-bday-month-label"></span>
+                  <span id="cal-bday-year-label" style="color:var(--bday-dot)"></span>
+                </div>
+                <button type="button" class="cal-nav" onclick="calShift(1,'bday')">&#8250;</button>
               </div>
               <div class="cal-weekdays">
                 <span>Su</span><span>Mo</span><span>Tu</span><span>We</span>
                 <span>Th</span><span>Fr</span><span>Sa</span>
               </div>
-              <div id="cal-grid" class="cal-grid"></div>
+              <div id="cal-grid-bday" class="cal-grid"></div>
               <div class="cal-footer">
-                <button type="button" class="cal-today-btn" onclick="calSelectToday()">Today</button>
+                <button type="button" class="cal-today-btn" onclick="calSelectToday('bday')">Today</button>
               </div>
             </div>
-          </div></div>
-          <div>
-            <label class="field-label">Time</label>
-            <input class="field-input" type="time" id="f-time" value="09:00" />
           </div>
         </div>
 
-        <label class="field-label">Priority</label>
-        <div class="priority-grid" id="priority-grid"></div>
+        <!-- Event (multi-day) date section -->
+        <div id="date-section-event" class="hidden" style="position:relative;">
+          <div class="two-col-equal">
+            <div>
+              <label class="field-label">Start Date</label>
+              <div id="cal-popup-wrap-start">
+                <button type="button" class="field-input cal-trigger" onclick="toggleCal('evstart')">
+                  <span id="cal-evstart-display">Start</span>
+                  <span class="cal-icon">📅</span>
+                </button>
+                <input type="hidden" id="f-evstart-date" />
+              </div>
+            </div>
+            <div>
+              <label class="field-label">End Date</label>
+              <div id="cal-popup-wrap-end">
+                <button type="button" class="field-input cal-trigger" onclick="toggleCal('evend')">
+                  <span id="cal-evend-display">End</span>
+                  <span class="cal-icon">📅</span>
+                </button>
+                <input type="hidden" id="f-evend-date" />
+              </div>
+            </div>
+          </div>
+          <!-- Popups anchored to the full-width section, not the narrow columns -->
+          <div id="cal-popup-evstart" class="cal-popup" style="display:none; left:0; right:0; width:auto; min-width:unset;">
+            <div class="cal-header">
+              <button type="button" class="cal-nav" onclick="calShift(-1,'evstart')">&#8249;</button>
+              <div class="cal-month-year">
+                <span id="cal-evstart-month-label"></span>
+                <span id="cal-evstart-year-label" style="color:var(--accent)"></span>
+              </div>
+              <button type="button" class="cal-nav" onclick="calShift(1,'evstart')">&#8250;</button>
+            </div>
+            <div class="cal-weekdays">
+              <span>Su</span><span>Mo</span><span>Tu</span><span>We</span>
+              <span>Th</span><span>Fr</span><span>Sa</span>
+            </div>
+            <div id="cal-grid-evstart" class="cal-grid"></div>
+            <div class="cal-footer">
+              <button type="button" class="cal-today-btn" onclick="calSelectToday('evstart')">Today</button>
+            </div>
+          </div>
+          <div id="cal-popup-evend" class="cal-popup" style="display:none; left:0; right:0; width:auto; min-width:unset;">
+            <div class="cal-header">
+              <button type="button" class="cal-nav" onclick="calShift(-1,'evend')">&#8249;</button>
+              <div class="cal-month-year">
+                <span id="cal-evend-month-label"></span>
+                <span id="cal-evend-year-label" style="color:var(--accent)"></span>
+              </div>
+              <button type="button" class="cal-nav" onclick="calShift(1,'evend')">&#8250;</button>
+            </div>
+            <div class="cal-weekdays">
+              <span>Su</span><span>Mo</span><span>Tu</span><span>We</span>
+              <span>Th</span><span>Fr</span><span>Sa</span>
+            </div>
+            <div id="cal-grid-evend" class="cal-grid"></div>
+            <div class="cal-footer">
+              <button type="button" class="cal-today-btn" onclick="calSelectToday('evend')">Today</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Priority (hidden for birthday) -->
+        <div id="priority-section">
+          <label class="field-label">Priority</label>
+          <div class="priority-grid" id="priority-grid"></div>
+        </div>
 
         <button class="submit-btn" id="submit-btn" onclick="submitTask()">Add Task</button>
       </div>
@@ -518,13 +713,16 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxVrU8jsex1oG68_TqJR
 const _now = new Date();
 const TODAY = _now.getFullYear() + '-' + String(_now.getMonth() + 1).padStart(2, '0') + '-' + String(_now.getDate()).padStart(2, '0');
 const PRIORITIES = ['Low', 'Medium', 'High', 'Urgent'];
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 let tasks = [];
 let dayOffset = 0;
 let activeFilter = 'All';
 let activePage = 'today';
+let currentTaskType = 'task'; // 'task' | 'birthday' | 'event'
+let timeMode = 'specific'; // 'specific' | 'allday'
 
-// ── Swipe support ────────────────────────────────────────────────────────────
+// ── Swipe support ─────────────────────────────────────────────────────────────
 let swipeStartX = null;
 const todayPage = document.getElementById('page-today');
 todayPage.addEventListener('touchstart', e => { swipeStartX = e.touches[0].clientX; }, { passive: true });
@@ -544,11 +742,11 @@ todayPage.addEventListener('mouseup', e => {
   mouseStartX = null;
 });
 
-// ── Date utils ───────────────────────────────────────────────────────────────
+// ── Date utils ────────────────────────────────────────────────────────────────
 function dateFromOffset(offset) {
   const d = new Date(TODAY + 'T00:00:00');
   d.setDate(d.getDate() + offset);
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  return fmtDate(d.getFullYear(), d.getMonth() + 1, d.getDate());
 }
 function relativeLabel(dateStr) {
   if (dateStr === TODAY) return 'Today';
@@ -559,8 +757,55 @@ function relativeLabel(dateStr) {
 function fullDateLabel(dateStr) {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
 }
+function fmtDate(y, m, d) {
+  return y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+}
+function addDays(dateStr, n) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() + n);
+  return fmtDate(d.getFullYear(), d.getMonth() + 1, d.getDate());
+}
 
-// ── API ──────────────────────────────────────────────────────────────────────
+// ── Birthday expansion ────────────────────────────────────────────────────────
+// Given a stored birthday (with original date), expand to a virtual task for current year
+function expandBirthdaysForDate(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const results = [];
+  tasks.forEach(t => {
+    if (t.type !== 'birthday') return;
+    const [by, bm, bd] = t.date.split('-').map(Number);
+    const thisYearBday = fmtDate(y, bm, bd);
+    if (thisYearBday === dateStr) {
+      const age = y - by;
+      results.push({ ...t, _effectiveDate: dateStr, _age: age > 0 ? age : null });
+    }
+  });
+  return results;
+}
+
+// ── Multi-day event expansion ─────────────────────────────────────────────────
+function expandEventsForDate(dateStr) {
+  const results = [];
+  tasks.forEach(t => {
+    if (t.type !== 'event') return;
+    if (!t.endDate) return;
+    if (dateStr >= t.date && dateStr <= t.endDate) {
+      results.push({ ...t, _effectiveDate: dateStr });
+    }
+  });
+  return results;
+}
+
+// Get all tasks visible on a given date (regular + birthday expansions + event spans)
+function getTasksForDate(dateStr) {
+  const regular = tasks.filter(t => t.type !== 'birthday' && t.type !== 'event' && t.date === dateStr);
+  const birthdays = expandBirthdaysForDate(dateStr);
+  const events = expandEventsForDate(dateStr);
+  // Remove events that also appear as their start date regular items
+  return [...birthdays, ...events, ...regular];
+}
+
+// ── API ───────────────────────────────────────────────────────────────────────
 async function apiFetch(action, body = {}) {
   const url = SCRIPT_URL + '?action=' + action;
   const opts = { method: 'POST', body: JSON.stringify(body) };
@@ -576,14 +821,11 @@ async function loadTasks() {
   }
   try {
     const data = await apiFetch('getTasks');
-   tasks = data.tasks || [];
-
-  /* Force app to today's task view on every launch */
-  dayOffset = 0;
-  showPage('today');
-
-renderToday();
-renderSheet();
+    tasks = data.tasks || [];
+    dayOffset = 0;
+    showPage('today');
+    renderToday();
+    renderSheet();
   } catch (e) {
     showToast('⚠️ Could not connect to Google Sheets');
   } finally {
@@ -595,12 +837,11 @@ async function toggleTask(id) {
   const task = tasks.find(t => t.id === id);
   if (!task) return;
   task.done = !task.done;
-  renderToday();
-  renderSheet();
+  renderToday(); renderSheet();
   try {
     await apiFetch('toggleTask', { id, done: task.done });
   } catch (e) {
-    task.done = !task.done; // rollback
+    task.done = !task.done;
     renderToday(); renderSheet();
     showToast('⚠️ Failed to save change');
   }
@@ -609,6 +850,15 @@ async function toggleTask(id) {
 async function deleteTask(id) {
   const idx = tasks.findIndex(t => t.id === id);
   if (idx === -1) return;
+  const task = tasks[idx];
+
+  // For multi-day events, confirm before deleting (makes clear it removes all days)
+  if (task.type === 'event' && task.endDate && task.date !== task.endDate) {
+    const days = daysBetween(task.date, task.endDate) + 1;
+    const confirmed = confirm(`Remove "${task.title}" from all ${days} days?`);
+    if (!confirmed) return;
+  }
+
   const removed = tasks.splice(idx, 1)[0];
   renderToday(); renderSheet();
   try {
@@ -624,14 +874,34 @@ async function deleteTask(id) {
 async function submitTask() {
   const title = document.getElementById('f-title').value.trim();
   if (!title) return;
-  const task = {
+
+  let task = {
     title,
     description: document.getElementById('f-desc').value.trim(),
-    date: document.getElementById('f-date').value || TODAY,
-    time: document.getElementById('f-time').value || '09:00',
-    priority: document.querySelector('.priority-btn.selected')?.dataset.p || 'Medium',
+    type: currentTaskType,
     done: false,
   };
+
+  if (currentTaskType === 'birthday') {
+    const bdayDate = document.getElementById('f-bday-date').value;
+    if (!bdayDate) { showToast('Please select a birth date'); return; }
+    task.date = bdayDate;
+    task.time = 'allday';
+    task.priority = 'Birthday';
+  } else if (currentTaskType === 'event') {
+    const startDate = document.getElementById('f-evstart-date').value;
+    const endDate   = document.getElementById('f-evend-date').value;
+    if (!startDate) { showToast('Please select a start date'); return; }
+    task.date    = startDate;
+    task.endDate = endDate || startDate;
+    task.time    = 'allday';
+    task.priority = document.querySelector('.priority-btn.selected')?.dataset.p || 'Medium';
+  } else {
+    task.date = document.getElementById('f-date').value || TODAY;
+    task.time = timeMode === 'allday' ? 'allday' : (document.getElementById('f-time').value || '09:00');
+    task.priority = document.querySelector('.priority-btn.selected')?.dataset.p || 'Medium';
+  }
+
   const btn = document.getElementById('submit-btn');
   btn.disabled = true; btn.textContent = 'Saving…';
   try {
@@ -641,10 +911,16 @@ async function submitTask() {
     renderToday(); renderSheet();
     btn.textContent = '✓ Added!'; btn.classList.add('success');
     setTimeout(() => { btn.textContent = 'Add Task'; btn.classList.remove('success'); btn.disabled = false; }, 1600);
+    // Reset form
     document.getElementById('f-title').value = '';
     document.getElementById('f-desc').value = '';
-    calSetDate(TODAY); // initialise custom calendar to today
+    calSetDate('start', TODAY);
+    calSetDate('bday', TODAY);
+    calSetDate('evstart', TODAY);
+    calSetDate('evend', TODAY);
     document.getElementById('f-time').value = '09:00';
+    setTimeMode('specific');
+    selectType('task');
     selectPriority('Medium');
     showPage('today');
   } catch (e) {
@@ -653,7 +929,34 @@ async function submitTask() {
   }
 }
 
-// ── Render: Today ────────────────────────────────────────────────────────────
+// ── Task type selection ────────────────────────────────────────────────────────
+function selectType(type) {
+  currentTaskType = type;
+  document.querySelectorAll('.type-tab').forEach(btn => {
+    btn.className = 'type-tab';
+    if (btn.dataset.type === type) btn.classList.add('sel-' + type);
+  });
+  // Show/hide sections
+  document.getElementById('date-section-task').classList.toggle('hidden', type !== 'task');
+  document.getElementById('date-section-birthday').classList.toggle('hidden', type !== 'birthday');
+  document.getElementById('date-section-event').classList.toggle('hidden', type !== 'event');
+  document.getElementById('bday-hint').classList.toggle('hidden', type !== 'birthday');
+  document.getElementById('priority-section').classList.toggle('hidden', type === 'birthday');
+  // Label
+  const labels = { task: 'What do you need to do?', birthday: 'Person\'s Name *', event: 'Event Name *' };
+  document.getElementById('f-title').placeholder = labels[type] || 'Title *';
+  document.getElementById('f-title-label').textContent = type === 'birthday' ? 'Person\'s Name *' : type === 'event' ? 'Event Name *' : 'Task Title *';
+}
+
+// ── Time mode ─────────────────────────────────────────────────────────────────
+function setTimeMode(mode) {
+  timeMode = mode;
+  document.getElementById('tmode-specific').classList.toggle('active', mode === 'specific');
+  document.getElementById('tmode-allday').classList.toggle('active', mode === 'allday');
+  document.getElementById('f-time').classList.toggle('hidden', mode === 'allday');
+}
+
+// ── Render: Today ─────────────────────────────────────────────────────────────
 function changeDay(dir) { dayOffset += dir; renderToday(); }
 
 function renderToday() {
@@ -661,9 +964,15 @@ function renderToday() {
   document.getElementById('day-label').textContent = relativeLabel(date);
   document.getElementById('day-full-label').textContent = fullDateLabel(date);
 
-  const dayTasks = tasks
-    .filter(t => t.date === date)
-    .sort((a, b) => a.time.localeCompare(b.time));
+  const dayTasks = getTasksForDate(date)
+    .sort((a, b) => {
+      // All-day / birthdays first
+      const aAllDay = a.time === 'allday' || a.type === 'birthday';
+      const bAllDay = b.time === 'allday' || b.type === 'birthday';
+      if (aAllDay && !bAllDay) return -1;
+      if (!aAllDay && bAllDay) return 1;
+      return a.time.localeCompare(b.time);
+    });
 
   const done = dayTasks.filter(t => t.done).length;
   const total = dayTasks.length;
@@ -676,66 +985,146 @@ function renderToday() {
   if (dayTasks.length === 0) {
     container.innerHTML = `<div class="empty">No tasks for this day.<br><span style="font-size:13px">Enjoy your free time! ✨</span></div>`;
   } else {
-    container.innerHTML = dayTasks.map(t => taskCardHTML(t)).join('');
+    container.innerHTML = dayTasks.map(t => taskCardHTML(t, date)).join('');
   }
   bindCheckColors();
 }
 
-// ── Render: Sheet ────────────────────────────────────────────────────────────
+// ── Render: Sheet ─────────────────────────────────────────────────────────────
 function renderSheet() {
   const search = document.getElementById('search-input')?.value.toLowerCase() || '';
-  let filtered = tasks
-    .filter(t => activeFilter === 'All' || t.priority === activeFilter)
-    .filter(t => !search || t.title.toLowerCase().includes(search) || (t.description || '').toLowerCase().includes(search))
-    .sort((a, b) => a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date));
 
-  const allDates = [...new Set(tasks.map(t => t.date))].sort();
-  document.getElementById('sheet-sub').textContent = `${tasks.length} tasks across ${allDates.length} days`;
+  // Collect all unique dates that have tasks (including birthday/event expansions)
+  // For birthdays, generate dates in a window of past year to +2 years
+  const dateSet = new Set();
+  tasks.forEach(t => {
+    if (t.type === 'birthday') {
+      // Generate occurrences for past 1 year and next 2 years
+      const [by, bm, bd] = t.date.split('-').map(Number);
+      for (let yr = _now.getFullYear() - 1; yr <= _now.getFullYear() + 2; yr++) {
+        dateSet.add(fmtDate(yr, bm, bd));
+      }
+    } else if (t.type === 'event' && t.endDate) {
+      let d = t.date;
+      while (d <= t.endDate) {
+        dateSet.add(d);
+        d = addDays(d, 1);
+      }
+    } else {
+      dateSet.add(t.date);
+    }
+  });
 
+  const allDates = [...dateSet].sort();
+  const allTaskCount = tasks.length;
+  document.getElementById('sheet-sub').textContent = `${allTaskCount} tasks`;
+
+  // Build grouped view
   const grouped = {};
-  filtered.forEach(t => { if (!grouped[t.date]) grouped[t.date] = []; grouped[t.date].push(t); });
+  allDates.forEach(date => {
+    let items = getTasksForDate(date);
+    if (activeFilter !== 'All') {
+      if (activeFilter === 'Birthday') items = items.filter(t => t.type === 'birthday');
+      else if (activeFilter === 'Event') items = items.filter(t => t.type === 'event');
+      else items = items.filter(t => t.priority === activeFilter && t.type !== 'birthday' && t.type !== 'event');
+    }
+    if (search) {
+      items = items.filter(t => t.title.toLowerCase().includes(search) || (t.description || '').toLowerCase().includes(search));
+    }
+    if (items.length > 0) grouped[date] = items;
+  });
 
   const container = document.getElementById('sheet-tasks');
+
   if (Object.keys(grouped).length === 0) {
     container.innerHTML = `<div class="empty">No tasks found.</div>`;
-  } else {
-    container.innerHTML = Object.entries(grouped).map(([date, dtasks]) => {
-      const isToday = date === TODAY;
-      const done = dtasks.filter(t => t.done).length;
-      return `
-        <div class="day-group">
-          <div class="day-group-header">
-            <span class="day-group-label ${isToday ? 'today-label' : ''}">${relativeLabel(date)}</span>
-            ${isToday ? '<span class="today-chip">TODAY</span>' : ''}
-            <div class="day-group-line"></div>
-            <span class="day-group-count">${done}/${dtasks.length}</span>
-          </div>
-          ${dtasks.map(t => taskCardHTML(t)).join('')}
-        </div>
-      `;
-    }).join('');
+    return;
   }
+
+  let html = '';
+  let todayRendered = false;
+  Object.entries(grouped).forEach(([date, dtasks]) => {
+    const isToday = date === TODAY;
+    if (isToday) todayRendered = true;
+    const done = dtasks.filter(t => t.done).length;
+    html += `
+      <div class="day-group" ${isToday ? 'id="sheet-today-group"' : ''}>
+        <div class="day-group-header">
+          <span class="day-group-label ${isToday ? 'today-label' : ''}">${relativeLabel(date)}</span>
+          ${isToday ? '<span class="today-chip">TODAY</span>' : ''}
+          <div class="day-group-line"></div>
+          <span class="day-group-count">${done}/${dtasks.length}</span>
+        </div>
+        ${dtasks.map(t => taskCardHTML(t, date)).join('')}
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
   bindCheckColors();
+
+  // Scroll today into view
+  if (todayRendered) {
+    requestAnimationFrame(() => {
+      const el = document.getElementById('sheet-today-group');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
 }
 
-// ── Task card HTML ────────────────────────────────────────────────────────────
-function taskCardHTML(t) {
-  const dotColors = { Low: '#2ecc71', Medium: '#f0a500', High: '#e8641a', Urgent: '#e82929' };
-  const dotColor = dotColors[t.priority] || '#aaa';
+// ── Task card HTML ─────────────────────────────────────────────────────────────
+function taskCardHTML(t, displayDate) {
+  const isBirthday = t.type === 'birthday';
+  const isEvent    = t.type === 'event';
+  const isMultiDay = isEvent && t.endDate && t.date !== t.endDate;
+  const isAllDay   = t.time === 'allday' || isBirthday;
+
+  const dotColors = { Low: '#2ecc71', Medium: '#f0a500', High: '#e8641a', Urgent: '#e82929', Birthday: '#a855f7' };
+  const dotColor = dotColors[t.priority] || (isBirthday ? '#a855f7' : '#aaa');
+
+  let checkIcon = t.done ? '✓' : (isBirthday ? '🎂' : '');
+  let cardClass = `task-card ${t.done ? 'done' : ''} ${isBirthday ? 'is-birthday' : ''} ${isMultiDay ? 'is-multiday' : ''} ${isAllDay && !isBirthday ? 'is-allday' : ''}`;
+
+  let timeLabel = '';
+  if (isBirthday) {
+    const age = t._age;
+    timeLabel = age ? `🎉 Turning ${age} today` : '🎉 Birthday';
+  } else if (isAllDay) {
+    timeLabel = '🌅 All day';
+  } else {
+    timeLabel = `⏰ ${t.time}`;
+  }
+
+  // Multi-day event span label
+  let spanLabel = '';
+  if (isMultiDay && displayDate) {
+    if (displayDate === t.date) spanLabel = '· Starts today';
+    else if (displayDate === t.endDate) spanLabel = '· Ends today';
+    else spanLabel = `· Day ${daysBetween(t.date, displayDate) + 1} of ${daysBetween(t.date, t.endDate) + 1}`;
+  }
+
+  const badgeClass = isBirthday ? 'p-Birthday' : `p-${t.priority}`;
+  const badgeText  = isBirthday ? '🎂 Birthday' : (isEvent ? (isMultiDay ? '📅 Event' : '📅 Event') : t.priority);
+
   return `
-    <div class="task-card ${t.done ? 'done' : ''}" data-id="${t.id}" data-dot="${dotColor}" onclick="handleCardClick(event,'${t.id}')">
-      <div class="task-check" data-dot="${dotColor}">${t.done ? '✓' : ''}</div>
+    <div class="${cardClass}" data-id="${t.id}" data-dot="${dotColor}" onclick="handleCardClick(event,'${t.id}')">
+      <div class="task-check" data-dot="${dotColor}">${checkIcon}</div>
       <div class="task-body">
         <div class="task-top">
           <span class="task-title">${escHtml(t.title)}</span>
-          <span class="priority-badge p-${t.priority}">${t.priority}</span>
+          <span class="priority-badge ${badgeClass}">${badgeText}</span>
         </div>
         ${t.description ? `<div class="task-desc">${escHtml(t.description)}</div>` : ''}
-        <div class="task-time">⏰ ${t.time}</div>
+        <div class="task-time">${timeLabel}${spanLabel ? ` <span style="color:#555;font-size:11px">${spanLabel}</span>` : ''}</div>
       </div>
-      <button class="task-del" onclick="event.stopPropagation(); deleteTask('${t.id}')" title="Delete">✕</button>
+      ${isBirthday ? '' : `<button class="task-del" onclick="event.stopPropagation(); deleteTask('${t.id}')" title="Delete">✕</button>`}
     </div>
   `;
+}
+
+function daysBetween(a, b) {
+  const d1 = new Date(a + 'T00:00:00'), d2 = new Date(b + 'T00:00:00');
+  return Math.round((d2 - d1) / 86400000);
 }
 
 function handleCardClick(e, id) {
@@ -772,8 +1161,8 @@ function selectPriority(p) {
 // ── Filter pills ──────────────────────────────────────────────────────────────
 function buildFilterPills() {
   const pills = document.getElementById('filter-pills');
-  pills.innerHTML = ['All', ...PRIORITIES].map(p =>
-    `<button class="pill ${p === 'All' ? 'active' : ''}" data-f="${p}" onclick="setFilter('${p}')">${p}</button>`
+  pills.innerHTML = ['All', ...PRIORITIES, 'Birthday', 'Event'].map(p =>
+    `<button class="pill ${p === 'All' ? 'active' : ''}" data-f="${p}" onclick="setFilter('${p}')">${p === 'Birthday' ? '🎂 Birthday' : p === 'Event' ? '📅 Event' : p}</button>`
   ).join('');
 }
 
@@ -791,7 +1180,7 @@ function showPage(name) {
   document.getElementById('page-' + name).classList.add('active');
   document.getElementById('nav-' + name).classList.add('active');
   if (name === 'today') renderToday();
-  if (name === 'sheet') renderSheet();
+  if (name === 'sheet') renderSheet(); // renderSheet scrolls to today automatically
 }
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
@@ -806,150 +1195,171 @@ function escHtml(s) {
   return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+// ── Custom Calendar (multi-instance) ─────────────────────────────────────────
+// Each calendar instance: 'start' (task), 'bday' (birthday), 'evstart', 'evend'
+const calState = {
+  start:   { year: 0, month: 0, selected: null },
+  bday:    { year: 0, month: 0, selected: null },
+  evstart: { year: 0, month: 0, selected: null },
+  evend:   { year: 0, month: 0, selected: null },
+};
 
-// ── Custom Calendar ───────────────────────────────────────────────────────────
-const MONTHS = ['January','February','March','April','May','June',
-                'July','August','September','October','November','December'];
+const calConfig = {
+  start:   { popup: 'cal-popup',        grid: 'cal-grid',        month: 'cal-month-label',        year: 'cal-year-label',        display: 'cal-display',        input: 'f-date',        wrap: 'cal-popup-wrap' },
+  bday:    { popup: 'cal-popup-bday',   grid: 'cal-grid-bday',   month: 'cal-bday-month-label',   year: 'cal-bday-year-label',   display: 'cal-bday-display',   input: 'f-bday-date',   wrap: 'cal-popup-wrap-bday' },
+  evstart: { popup: 'cal-popup-evstart',grid: 'cal-grid-evstart',month: 'cal-evstart-month-label',year: 'cal-evstart-year-label',display: 'cal-evstart-display',input: 'f-evstart-date',wrap: 'date-section-event' },
+  evend:   { popup: 'cal-popup-evend',  grid: 'cal-grid-evend',  month: 'cal-evend-month-label',  year: 'cal-evend-year-label',  display: 'cal-evend-display',  input: 'f-evend-date',  wrap: 'date-section-event' },
+};
 
-let calYear  = 0;
-let calMonth = 0;   // 0-indexed
-let calSelected = null; // 'YYYY-MM-DD' string
-
-function calSetDate(dateStr) {
-  calSelected = dateStr;
-  document.getElementById('f-date').value = dateStr;
-  const [y, m, d] = dateStr.split('-').map(Number);
-  calYear  = y;
-  calMonth = m - 1;
-  updateCalDisplay();
-}
-
-function updateCalDisplay() {
-  const d = document.getElementById('cal-display');
-  if (calSelected) {
-    const dt = new Date(calSelected + 'T00:00:00');
-    d.textContent = dt.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-  } else {
-    d.textContent = 'Select a date';
+function calSetDate(inst, dateStr) {
+  const s = calState[inst];
+  const c = calConfig[inst];
+  s.selected = dateStr;
+  document.getElementById(c.input).value = dateStr;
+  const [y, m] = dateStr.split('-').map(Number);
+  s.year = y; s.month = m - 1;
+  // Update display
+  const disp = document.getElementById(c.display);
+  if (disp) {
+    if (inst === 'evstart') disp.textContent = new Date(dateStr + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    else if (inst === 'evend') disp.textContent = new Date(dateStr + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    else disp.textContent = new Date(dateStr + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
   }
 }
 
-function toggleCal() {
-  const popup = document.getElementById('cal-popup');
-  if (popup.style.display === 'none' || popup.style.display === '') {
-    // open: set view to selected date or today
-    if (!calSelected) calSetDate(TODAY);
-    renderCalGrid();
+function toggleCal(inst) {
+  const c = calConfig[inst];
+  const popup = document.getElementById(c.popup);
+  const isOpen = popup.style.display !== 'none' && popup.style.display !== '';
+  // Close all first
+  Object.values(calConfig).forEach(cfg => {
+    document.getElementById(cfg.popup).style.display = 'none';
+  });
+  document.removeEventListener('click', _calOutsideHandler);
+  if (!isOpen) {
+    if (!calState[inst].selected) calSetDate(inst, TODAY);
+    renderCalGrid(inst);
     popup.style.display = 'block';
-    // close on outside click
-    setTimeout(() => document.addEventListener('click', calOutsideClick), 0);
-  } else {
-    closeCal();
+    setTimeout(() => {
+      _calOutsideInst = inst;
+      document.addEventListener('click', _calOutsideHandler);
+    }, 0);
   }
 }
 
-function closeCal() {
-  document.getElementById('cal-popup').style.display = 'none';
-  document.removeEventListener('click', calOutsideClick);
+let _calOutsideInst = null;
+function _calOutsideHandler(e) {
+  if (!_calOutsideInst) return;
+  const c = calConfig[_calOutsideInst];
+  const wrap = document.getElementById(c.wrap);
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById(c.popup).style.display = 'none';
+    document.removeEventListener('click', _calOutsideHandler);
+    _calOutsideInst = null;
+  }
 }
 
-function calOutsideClick(e) {
-  const wrap = document.getElementById('cal-popup-wrap');
-  if (!wrap.contains(e.target)) closeCal();
+function calShift(dir, inst) {
+  const s = calState[inst];
+  s.month += dir;
+  if (s.month > 11) { s.month = 0;  s.year++; }
+  if (s.month < 0)  { s.month = 11; s.year--; }
+  renderCalGrid(inst);
 }
 
-function calShift(dir) {
-  calMonth += dir;
-  if (calMonth > 11) { calMonth = 0;  calYear++; }
-  if (calMonth < 0)  { calMonth = 11; calYear--; }
-  renderCalGrid();
+function calSelectToday(inst) {
+  calSetDate(inst, TODAY);
+  renderCalGrid(inst);
+  document.getElementById(calConfig[inst].popup).style.display = 'none';
 }
 
-function calSelectToday() {
-  calSetDate(TODAY);
-  calYear  = parseInt(TODAY.split('-')[0]);
-  calMonth = parseInt(TODAY.split('-')[1]) - 1;
-  renderCalGrid();
-  closeCal();
+function calSelectDay(inst, dateStr) {
+  calSetDate(inst, dateStr);
+  document.getElementById(calConfig[inst].popup).style.display = 'none';
+  // If selecting start of event and end not set, pre-fill end
+  if (inst === 'evstart' && !calState.evend.selected) {
+    calSetDate('evend', dateStr);
+  }
 }
 
-function calSelectDay(dateStr) {
-  calSetDate(dateStr);
-  closeCal();
-}
+function renderCalGrid(inst) {
+  const s = calState[inst];
+  const c = calConfig[inst];
+  document.getElementById(c.month).textContent = MONTHS[s.month];
+  document.getElementById(c.year).textContent  = s.year;
 
-function renderCalGrid() {
-  document.getElementById('cal-month-label').textContent = MONTHS[calMonth];
-  document.getElementById('cal-year-label').textContent  = calYear;
+  const grid  = document.getElementById(c.grid);
+  const first = new Date(s.year, s.month, 1).getDay();
+  const days  = new Date(s.year, s.month + 1, 0).getDate();
+  const prevDays = new Date(s.year, s.month, 0).getDate();
 
-  const grid  = document.getElementById('cal-grid');
-  const first = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
-  const days  = new Date(calYear, calMonth + 1, 0).getDate();
-
-  // Previous month tail
-  const prevDays = new Date(calYear, calMonth, 0).getDate();
+  // Get event range for highlighting
+  const evStart = calState.evstart.selected;
+  const evEnd   = calState.evend.selected;
 
   let cells = '';
 
-  // Trailing days from prev month
   for (let i = first - 1; i >= 0; i--) {
-    const day   = prevDays - i;
-    const prevM = calMonth === 0 ? 11 : calMonth - 1;
-    const prevY = calMonth === 0 ? calYear - 1 : calYear;
-    const ds    = fmtDate(prevY, prevM + 1, day);
-    cells += calDayHTML(ds, day, true);
+    const day = prevDays - i;
+    const prevM = s.month === 0 ? 11 : s.month - 1;
+    const prevY = s.month === 0 ? s.year - 1 : s.year;
+    const ds = fmtDate(prevY, prevM + 1, day);
+    cells += calDayHTML(inst, ds, day, true, evStart, evEnd);
   }
-
-  // Current month
   for (let d = 1; d <= days; d++) {
-    const ds = fmtDate(calYear, calMonth + 1, d);
-    cells += calDayHTML(ds, d, false);
+    const ds = fmtDate(s.year, s.month + 1, d);
+    cells += calDayHTML(inst, ds, d, false, evStart, evEnd);
   }
-
-  // Leading days from next month
   const filled = first + days;
   const trail  = filled % 7 === 0 ? 0 : 7 - (filled % 7);
   for (let d = 1; d <= trail; d++) {
-    const nextM = calMonth === 11 ? 0  : calMonth + 1;
-    const nextY = calMonth === 11 ? calYear + 1 : calYear;
-    const ds    = fmtDate(nextY, nextM + 1, d);
-    cells += calDayHTML(ds, d, true);
+    const nextM = s.month === 11 ? 0  : s.month + 1;
+    const nextY = s.month === 11 ? s.year + 1 : s.year;
+    const ds = fmtDate(nextY, nextM + 1, d);
+    cells += calDayHTML(inst, ds, d, true, evStart, evEnd);
   }
-
   grid.innerHTML = cells;
 }
 
-function calDayHTML(ds, label, otherMonth) {
-  const isSel   = ds === calSelected;
+function calDayHTML(inst, ds, label, otherMonth, evStart, evEnd) {
+  const s = calState[inst];
+  const isSel   = ds === s.selected;
   const isToday = ds === TODAY;
-  const classes = [
-    'cal-day',
+
+  let inRange = false, isRangeStart = false, isRangeEnd = false;
+  if (evStart && evEnd && evStart <= evEnd) {
+    isRangeStart = ds === evStart;
+    isRangeEnd   = ds === evEnd;
+    inRange = ds > evStart && ds < evEnd;
+  }
+
+  const classes = ['cal-day',
     otherMonth ? 'other-month' : '',
     isToday    ? 'is-today'    : '',
     isSel      ? 'is-selected' : '',
+    inRange    ? 'in-range'    : '',
+    isRangeStart ? 'range-start' : '',
+    isRangeEnd   ? 'range-end'   : '',
   ].filter(Boolean).join(' ');
-  return `<button type="button" class="${classes}" onclick="calSelectDay('${ds}')">${label}</button>`;
-}
 
-function fmtDate(y, m, d) {
-  return y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+  return `<button type="button" class="${classes}" onclick="calSelectDay('${inst}','${ds}')">${label}</button>`;
 }
-
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-calSetDate(TODAY); // initialise custom calendar to today
+calSetDate('start', TODAY);
+calSetDate('bday', TODAY);
+calSetDate('evstart', TODAY);
+calSetDate('evend', TODAY);
 buildPriorityGrid();
 buildFilterPills();
+selectType('task');
+setTimeMode('specific');
 
-/* Always open on Today's tasks, with offset reset to current day */
 dayOffset = 0;
 showPage('today');
-
-/* Render empty shell immediately so UI isn't blank */
 renderToday();
 renderSheet();
 
-/* Load tasks from Google Sheets */
 setTimeout(loadTasks, 100);
 </script>
 </body>
